@@ -33,28 +33,32 @@ def internet_on():
         else:
             return True
     except:
-        
+        current_time = datetime.now()
+        with open(text_file, "a") as myfile:
+            myfile.write(f"No internet @ {current_time}\n")
         return False
 
 def constant_check():
     global internet
     current_time = datetime.now()
     current_status = internet_on()
-    if (current_status != internet) & internet_on():
-        print("\n", "-"*40)
-        print(f"Internet Returns @ {current_time}")
-        print("-"*40)
+    if (current_status != internet) & (internet_on() is True):
         internet = True
+        print("\n", "-"*40, flush=True)
+        print(f"Internet: {internet}", flush=True)
+        print(f"Internet Returns @ {current_time}", flush=True)
+        print("-"*40, flush=True)
 
         with open(text_file, "a") as myfile:
             myfile.write(f"Internet Returns @ {current_time}\n")
 
 
-    elif (current_status != internet) & (not internet_on()):
-        print("\n", "-"*40)
-        print(f"No internet @ {current_time}")
-        print("-"*40)
+    elif (current_status != internet) & (internet_on() is False):
         internet = False
+        print("\n", "-"*40, flush=True)
+        print(f"Internet: {internet}", flush=True)
+        print(f"No internet @ {current_time}", flush=True)
+        print("-"*40, flush=True)
 
         with open(text_file, "a") as myfile:
             myfile.write(f"No internet @ {current_time}\n")
@@ -94,7 +98,12 @@ def run_threaded(job_func):
     job_thread = threading.Thread(target=job_func)
     job_thread.start()
 
-hours = ['00:05', '01:05', '02:05', '03:05', '04:05', '05:05', '06:05', '07:05', '08:05', '09:05', '10:05', '11:05', '12:05', '13:05', '14:05', '15:05', '16:05', '17:05', '18:05', '19:05', '20:05', '21:05', '22:05', '23:05']
+hours = [
+    '00:05', '01:05', '02:05', '03:05', '04:05', '05:05', 
+    '06:05', '07:05', '08:05', '09:05', '10:05', '11:05', 
+    '12:05', '13:05', '14:05', '15:05', '16:05', '17:05', 
+    '18:05', '19:05', '20:05', '21:05', '22:05', '23:05'
+]
 
 def schedule_test():
     delay = int(input("Time between tests: "))
@@ -125,8 +134,8 @@ def test():
     #    myfile.write(f"Testing")
     print("\nhello")
 
-#schedule.every(30).seconds.do(run_threaded, internet_on)
-schedule.every(5).seconds.do(run_threaded, constant_check)
+schedule.every(15).seconds.do(run_threaded, internet_on)
+#schedule.every(5).seconds.do(run_threaded, constant_check)
 
 #schedule.every().day.at("00:00").do(run_threaded, status)
 #schedule.every(3).seconds.do(run_threaded, status)
@@ -157,7 +166,3 @@ def run():
         t.sleep(1)
 
 run()
-
-
-# TODO: make internet check func run every 5 sec and only record when state flips
-# TODO: add path input and store data outside git folder
