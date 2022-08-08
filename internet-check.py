@@ -92,8 +92,8 @@ def speed_check():
         line = "-"*45
 
         print(f"\n{line}")
-        print(current_time)
-        print(f"[cyan]Download: {download}[/]\n[purple]Upload: {upload}[/]")
+        console.print(current_time)
+        console.print(f"[cyan]Download: {download}[/]\n[magenta]Upload: {upload}[/]")
         print(f"Speedtest Duration: {speed_dur}")
         print(f"Write Duration: {write_dur}")
         print(f"{line}")
@@ -166,7 +166,7 @@ schedule_test()
 
 print("Jobs:", schedule.get_jobs())
 #showtime()
-console.print("Start time: ", datetime.now(), style="magenta")
+console.print("Start time: ", datetime.now(), style="yellow")
 #status()
 
 #@Halo(text='Running', spinner={"interval": 80,	"frames": ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]})
