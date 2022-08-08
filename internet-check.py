@@ -13,7 +13,7 @@ from rich.console import Console
 console = Console()
 
 # Insert path to data files here
-datapath = r"C:\Users\Caelan\Documents\Programming\Python\internet-check"
+datapath = r""
 text_file = rf'{datapath}\no_internet.txt'
 speed_file = rf'{datapath}\speed.csv'
 
