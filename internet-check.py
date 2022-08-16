@@ -6,6 +6,7 @@ import csv
 import schedule
 import threading
 from rich.console import Console
+import random
 #from alive_progress import alive_bar
 #from alive_progress.styles import showtime
 #from halo import Halo
@@ -70,36 +71,44 @@ def constant_check():
         with open(text_file, "a") as myfile:
             myfile.write(f"No internet @ {current_time}\n")
 
+# TODO: add try/except if speedcheck fails
 def speed_check():
     current_time = datetime.now()
-    if internet_on():
-        start = t.time()
-        st = speedtest.Speedtest()
-        st.get_best_server()
-        download = st.download()/1000000
-        upload = st.upload()/1000000
-        end = t.time()
-        speed_dur = end - start
+    line = "-"*45
+    try:
+        if internet_on():
+            start = t.time()
+            st = speedtest.Speedtest()
+            st.get_best_server()
+            download = st.download()/1000000
+            upload = st.upload()/1000000
+            end = t.time()
+            speed_dur = end - start
 
-        start = t.time()
-        fields = [current_time,download,upload]
-        with open(speed_file, 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(fields)
-        end = t.time()
-        write_dur = end - start
+            start = t.time()
+            fields = [current_time,download,upload]
+            with open(speed_file, 'a', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(fields)
+            end = t.time()
+            write_dur = end - start
 
-        line = "-"*45
 
+            print(f"\n{line}")
+            console.print(current_time)
+            console.print(f"[cyan]Download: {download}[/]\n[magenta]Upload: {upload}[/]")
+            print(f"Speedtest Duration: {speed_dur}")
+            print(f"Write Duration: {write_dur}")
+            print(f"{line}")
+        else:
+            print(f"\n{line}")
+            console.print(current_time)
+            console.print(f"Speedtest unavailable \nNo Internet", style="red")
+            print(f"{line}")
+    except Exception as e:
         print(f"\n{line}")
         console.print(current_time)
-        console.print(f"[cyan]Download: {download}[/]\n[magenta]Upload: {upload}[/]")
-        print(f"Speedtest Duration: {speed_dur}")
-        print(f"Write Duration: {write_dur}")
-        print(f"{line}")
-    else:
-        print(f"\n{line}")
-        print(f"No internet @ {current_time}")
+        console.print(f"Speedtest unavailable \n{repr(e)}", style="red")
         print(f"{line}")
 
 def run_threaded(job_func):
@@ -107,37 +116,43 @@ def run_threaded(job_func):
     job_thread.start()
 
 
-# TODO add option to choose minute offset
+# TODO add randomized timing
 hours = [
-    '00:15', '01:15', '02:15', '03:15', '04:15', '05:15', 
-    '06:15', '07:15', '08:15', '09:15', '10:15', '11:15', 
-    '12:15', '13:15', '14:15', '15:15', '16:15', '17:15', 
-    '18:15', '19:15', '20:15', '21:15', '22:15', '23:15'
+    '00:', '01:', '02:', '03:', '04:', '05:', 
+    '06:', '07:', '08:', '09:', '10:', '11:', 
+    '12:', '13:', '14:', '15:', '16:', '17:', 
+    '18:', '19:', '20:', '21:', '22:', '23:'
 ]
+
+def random_hours(hours):
+    hour_min = hours
+    for i, val in enumerate(hour_min):
+        minute = random.randint(1, 59)
+        while (minute % 5) == 0:
+            minute = random.randint(1, 59)
+        hour_min[i] = f"{val}{minute:02d}"
+    return hour_min
 
 def schedule_test():
     delay = int(input("Time between tests: "))
     offset = int(input("Offset: "))
 
+    hour_min = random_hours(hours)
+
     i = offset
     while i < len(hours):
-        schedule.every().day.at(hours[i]).do(run_threaded, speed_check)
+        schedule.every().day.at(hour_min[i]).do(run_threaded, speed_check).tag("speed")
         i += delay
 
-#def status():
-#    now = datetime.now()
-#    current_time = now.strftime("%H:%M:%S")
-#    spinner = Halo(text='Running', spinner={"interval": 80,	"frames": ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]})
-#    spinner.start()
+def job_print():
+    print("Jobs:")
+    for i in schedule.get_jobs():
+        print(f"    {repr(i)}")
 
-    #for i in range(5):
-    #    print("Running", "."*i, end="\r")
-    #    t.sleep(0.5)
-    #with alive_bar(title="Running", unknown='dots_waves2', stats=False, monitor=False) as bar:
-    #    while datetime.now().time() < time(23, 59, 55):
-    #        bar()
-    #        now = datetime.now()
-    #        current_time = now.strftime("%H:%M:%S")
+def reset():
+    schedule.clear("speed")
+    schedule_test()
+    job_print()
 
 def test():
     #with open("test.txt", "a") as myfile:
@@ -146,28 +161,17 @@ def test():
 
 #schedule.every(15).seconds.do(run_threaded, internet_on)
 schedule.every(5).seconds.do(run_threaded, constant_check)
-
-#schedule.every().day.at("00:00").do(run_threaded, status)
-#schedule.every(3).seconds.do(run_threaded, status)
-
-#time = ['08:56']
-#schedule.every().day.at(time[0]).do(run_threaded, speed_check)
-
-#schedule.every().day.at("00:00").do(run_threaded, speed_check)
-#schedule.every().day.at("03:00").do(run_threaded, speed_check)
-#schedule.every().day.at("06:00").do(run_threaded, speed_check)
-#schedule.every().day.at("09:00").do(run_threaded, speed_check)
-#schedule.every().day.at("12:00").do(run_threaded, speed_check)
-#schedule.every().day.at("15:00").do(run_threaded, speed_check)
-#schedule.every().day.at("18:00").do(run_threaded, speed_check)
-#schedule.every().day.at("21:00").do(run_threaded, speed_check)
+schedule.every().day.at("00:00").do(run_threaded,reset)
 
 schedule_test()
 
-print("Jobs:", schedule.get_jobs())
+job_print()
+
 #showtime()
 console.print("Start time: ", datetime.now(), style="yellow")
 #status()
+
+#random_hours(hours)
 
 #@Halo(text='Running', spinner={"interval": 80,	"frames": ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]})
 def main():
