@@ -130,28 +130,30 @@ def random_hours(hours):
         minute = random.randint(1, 59)
         while (minute % 5) == 0:
             minute = random.randint(1, 59)
-        hour_min[i] = f"{val}{minute:02d}"
+        hr = val.split(":")
+        hour_min[i] = f"{hr[0]}:{minute:02d}"
     return hour_min
 
-def schedule_test():
-    delay = int(input("Time between tests: "))
-    offset = int(input("Offset: "))
+def schedule_test(delay, offset, hours):
 
     hour_min = random_hours(hours)
+    #print(hour_min)
 
     i = offset
-    while i < len(hours):
+    while i < len(hour_min):
+        #print(i)
+        #print(hour_min[i])
         schedule.every().day.at(hour_min[i]).do(run_threaded, speed_check).tag("speed")
         i += delay
 
 def job_print():
     print("Jobs:")
     for i in schedule.get_jobs():
-        print(f"    {repr(i)}")
+        print(f"    {repr(i).split(')')[0]})")
 
-def reset():
+def reset(delay, offset):
     schedule.clear("speed")
-    schedule_test()
+    schedule_test(delay, offset, hours)
     job_print()
 
 def test():
@@ -161,9 +163,12 @@ def test():
 
 #schedule.every(15).seconds.do(run_threaded, internet_on)
 schedule.every(5).seconds.do(run_threaded, constant_check)
-schedule.every().day.at("00:00").do(run_threaded,reset)
+schedule.every().day.at("00:00").do(run_threaded, reset)
 
-schedule_test()
+delay = int(input("Time between tests: "))
+offset = int(input("Offset: "))
+schedule_test(delay, offset, hours)
+#reset(delay, offset)
 
 job_print()
 
