@@ -13,8 +13,13 @@ import random
 
 console = Console()
 
+# TODO: use ./ or .\ depending on os
+# Check os
+# from sys import platform
+# platform.startswith('win')
+
 # Insert path to data files here
-datapath = r""
+datapath = r"C:\Users\Caelan\Documents\Programming\Python\internet-check"
 text_file = rf'{datapath}\no_internet.txt'
 speed_file = rf'{datapath}\speed.csv'
 
@@ -151,7 +156,7 @@ def job_print():
     for i in schedule.get_jobs():
         print(f"    {repr(i).split(')')[0]})")
 
-def reset(delay, offset):
+def reset():
     schedule.clear("speed")
     schedule_test(delay, offset, hours)
     job_print()
