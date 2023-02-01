@@ -7,21 +7,20 @@ import schedule
 import threading
 from rich.console import Console
 import random
+import os
 #from alive_progress import alive_bar
 #from alive_progress.styles import showtime
 #from halo import Halo
 
 console = Console()
 
-# TODO: use ./ or .\ depending on os
-# Check os
-# from sys import platform
-# platform.startswith('win')
-
 # Insert path to data files here
-datapath = r"C:\Users\Caelan\Documents\Programming\Python\internet-check"
-text_file = rf'{datapath}\no_internet.txt'
-speed_file = rf'{datapath}\speed.csv'
+#datapath = r"C:\Users\Caelan\Documents\Programming\Python\internet-check"
+#text_file = rf'{datapath}\no_internet.txt'
+#speed_file = rf'{datapath}\speed.csv'
+mainpath = os.getcwd()
+text_file = os.path.join(mainpath, 'no_internet.txt')
+speed_file = os.path.join(mainpath, 'speed.csv')
 
 print(f"Data files: \n{text_file} \n{speed_file}")
 
